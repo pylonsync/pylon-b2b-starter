@@ -1,0 +1,71 @@
+---
+title: Send invitations
+description: "Invite teammates to an organization."
+---
+
+# Send invitations
+
+Onboarding step 2 sends one invite email per address. The pattern below is reusable from anywhere in the app.
+
+## Server function
+
+`packages/db/functions/sendInvitation.ts`:
+
+```ts
+import { mutation, v } from "@pylonsync/functions";
+import { randomBytes } from "node:crypto";
+
+export default mutation({
+  args: {
+    orgId: v.string(),
+    email: v.string(),
+    role: v.string(),
+  },
+  async handler(ctx, args) {
+    if (!ctx.auth.userId) throw ctx.error("UNAUTHENTICATED", "");
+    // Role gate: caller must be owner/admin of the target org.
+    const member = (await ctx.db.query("OrgMember")).find(
+      (m) =>
+        (m as any).userId === ctx.auth.userId &&
+        (m as any).orgId === args.orgId,
+    );
+    if (!member || !["owner", "admin"].includes((member as any).role)) {
+      throw ctx.error("FORBIDDEN", "Only org admins can invite");
+    }
+
+    const token = randomBytes(24).toString("hex");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await ctx.db.insert("Invitation", {
+      orgId: args.orgId,
+      email: args.email.trim().toLowerCase(),
+      role: args.role,
+      token,
+      invitedBy: ctx.auth.userId,
+      expiresAt: expiresAt.toISOString(),
+      createdAt: new Date().toISOString(),
+    });
+
+    // Optional: send an actual email here via your provider
+    // await sendInviteEmail({ email: args.email, token });
+
+    return { token };
+  },
+});
+```
+
+## Accept invitation
+
+Invited users land on `/accept-invite?token=...`. The dashboard has a route handler that:
+
+1. Looks up `Invitation` by `token`
+2. Checks `expiresAt > now` and `acceptedAt is null`
+3. Creates an `OrgMember` row for the current user + the invitation's `orgId` + `role`
+4. Marks the invitation `acceptedAt = now`
+5. Sets the active-org cookie + redirects to `/`
+
+If the user isn't logged in yet, the route stashes the token in `sessionStorage` and bounces to `/signup`. After signup, the accept handler runs.
+
+## UI
+
+The invite UI lives in `apps/dashboard/components/onboarding/flow.tsx` (step 2) and `apps/dashboard/components/members/invite-dialog.tsx` (admin invites from the Members page).

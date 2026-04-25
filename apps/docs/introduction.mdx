@@ -1,0 +1,55 @@
+---
+title: Introduction
+description: "The realtime B2B starter — multi-tenant on day one."
+---
+
+# Pylon B2B
+
+The realtime backend for B2B SaaS. Multi-tenant from line one — live queries, policies, organizations, billing, audit log all wired up before you start.
+
+## Why this exists
+
+Every SaaS team writes the same boring scaffolding:
+
+- Email + password auth
+- Multi-tenancy that doesn't leak rows across orgs
+- Org → member → role-based access
+- Invitations that survive page reloads
+- Stripe billing tied to seat counts
+- Audit log for SOC2
+
+Pylon B2B ships these wired up so you can start product work on day one instead of week six.
+
+## What's in the monorepo
+
+<CardGroup cols={2}>
+  <Card title="apps/marketing" icon="globe">
+    Next.js 16 — landing page, pricing, CTA.
+  </Card>
+  <Card title="apps/dashboard" icon="layout">
+    Next.js 16 — the product. shadcn sidebar, full org onboarding.
+  </Card>
+  <Card title="apps/docs" icon="book-open">
+    This site. Mintlify + MDX.
+  </Card>
+  <Card title="packages/*" icon="package">
+    `ui` (shadcn), `auth` (sessions), `db` (Pylon manifest), `config`.
+  </Card>
+</CardGroup>
+
+## Get going
+
+```bash
+git clone https://github.com/pylonsync/pylon-b2b-starter.git
+cd pylon-b2b-starter
+bun install
+bun dev
+```
+
+Three apps come up:
+
+- Marketing: `http://localhost:3000`
+- Dashboard: `http://localhost:3001`
+- Docs: `http://localhost:3002`
+
+Continue to [Quickstart](/quickstart).

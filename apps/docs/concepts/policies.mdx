@@ -1,0 +1,61 @@
+---
+title: Policies
+description: "Tenant isolation rules that run alongside every read and write."
+---
+
+# Policies
+
+Pylon evaluates a string expression on every entity operation. The B2B starter uses two patterns:
+
+## Pattern 1: authenticated reads + ownership writes
+
+For per-user entities the client always queries with `where: { userId }`, so reads only need an authentication gate. Writes use `data.userId` to prevent impersonation.
+
+```ts
+const Note = entity("Note", { /* … */ });
+
+policy({
+  name: "note_owner",
+  entity: "Note",
+  allowRead: "auth.userId != null",
+  allowInsert: "auth.userId == data.userId",
+  allowUpdate: "auth.userId != null",
+  allowDelete: "auth.userId != null",
+});
+```
+
+## Pattern 2: function-mediated writes
+
+For entities where ownership is multi-row (e.g. an `OrgMember` row only valid if the actor is an org admin), the policy denies direct writes and a server function mediates with role checks.
+
+```ts
+policy({
+  name: "member_visible",
+  entity: "OrgMember",
+  allowRead: "auth.userId != null",
+  allowInsert: "false",   // via inviteMember server function
+  allowUpdate: "auth.userId != null",
+  allowDelete: "auth.userId != null",
+});
+```
+
+Server functions run with the caller's auth context and can call into `ctx.db.insert/update` without re-evaluating the policy. They're the right place for "actor must be an admin and target user is in the same org" checks.
+
+## Audit policy
+
+The `AuditEvent` entity is the simplest case — append-only, no client writes:
+
+```ts
+policy({
+  name: "audit_readonly",
+  entity: "AuditEvent",
+  allowRead: "auth.userId != null",
+  allowInsert: "false",   // server functions only
+  allowUpdate: "false",
+  allowDelete: "false",
+});
+```
+
+## Why string expressions
+
+Policies are stored alongside the schema (in `packages/db/src/manifest.ts`) and evaluated at the storage boundary. They live in your repo, version-controlled with the rest of the schema, and don't require redeploying a custom auth service when you change them. Pylon compiles the expression once at startup and runs it as bytecode on every operation.

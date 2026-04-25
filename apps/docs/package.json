@@ -1,0 +1,15 @@
+{
+  "name": "@pylon-b2b/docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "mintlify dev --port 3002",
+    "build": "mintlify build",
+    "broken-links": "mintlify broken-links",
+    "preview": "mintlify dev --port 3002"
+  },
+  "devDependencies": {
+    "mintlify": "^4.2.0"
+  }
+}

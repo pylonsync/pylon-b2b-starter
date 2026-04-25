@@ -1,0 +1,85 @@
+---
+title: Deploying
+description: "Vercel, Fly, self-hosted — pick your shape."
+---
+
+# Deploying
+
+Three apps deploy independently because they cache and scale differently:
+
+| App | Best fit |
+|---|---|
+| `marketing` | Static-friendly. Vercel, Netlify, Cloudflare Pages. |
+| `docs` | Static-friendly. Same options as marketing. |
+| `dashboard` | Needs Node runtime for SSR + auth cookies. Vercel, Fly, Render. |
+| Pylon backend | Long-lived process. Fly, Railway, your own VPS. |
+
+## Vercel (recommended for the apps)
+
+```bash
+# Marketing
+cd apps/marketing
+vercel --prod
+# Set env: NEXT_PUBLIC_DASHBOARD_URL, NEXT_PUBLIC_DOCS_URL, NEXT_PUBLIC_SITE_URL
+
+# Dashboard
+cd apps/dashboard
+vercel --prod
+# Set env: PYLON_BASE_URL, NEXT_PUBLIC_PYLON_URL, STRIPE_SECRET_KEY, …
+```
+
+Each app is a standalone Vercel project so they get their own domains, env vars, and scaling profiles.
+
+## Pylon backend on Fly
+
+```bash
+cd packages/db
+fly launch --no-deploy
+fly volumes create pylon_data --size 10
+# Edit fly.toml — mount /data, set DATABASE_URL=sqlite:///data/pylon.db
+fly deploy
+```
+
+For Postgres, set `DATABASE_URL=postgres://...` and skip the volume — Fly's Postgres add-on or any external Postgres works.
+
+## Self-hosted (one VPS)
+
+For tiny deployments, run all three apps + Pylon on a single $5 VPS behind Caddy:
+
+```caddyfile
+acme.example.com {
+  reverse_proxy localhost:3000
+}
+app.acme.example.com {
+  reverse_proxy localhost:3001
+}
+docs.acme.example.com {
+  reverse_proxy localhost:3002
+}
+api.acme.example.com {
+  reverse_proxy localhost:4321
+}
+```
+
+Use `pm2` or a systemd unit per app + `pylon dev --prod` for the backend.
+
+## Environment variables
+
+<AccordionGroup>
+  <Accordion title="apps/marketing" icon="globe">
+    - `NEXT_PUBLIC_SITE_URL` — your marketing canonical URL
+    - `NEXT_PUBLIC_DASHBOARD_URL` — dashboard origin (for "Sign up" CTAs)
+    - `NEXT_PUBLIC_DOCS_URL` — docs origin
+  </Accordion>
+  <Accordion title="apps/dashboard" icon="layout">
+    - `PYLON_BASE_URL` — internal Pylon URL (server-to-server)
+    - `NEXT_PUBLIC_PYLON_URL` — public Pylon URL (browser-to-server)
+    - `STRIPE_SECRET_KEY`
+    - `STRIPE_WEBHOOK_SECRET`
+    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+    - `RESEND_API_KEY` (if using Resend for invitation emails)
+  </Accordion>
+  <Accordion title="apps/docs" icon="book-open">
+    - none required for `mintlify dev`. Hosting on Mintlify Cloud → push to GitHub.
+  </Accordion>
+</AccordionGroup>

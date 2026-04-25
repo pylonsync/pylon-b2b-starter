@@ -1,0 +1,72 @@
+---
+title: Billing
+description: "Stripe customer + subscription wired up to the Pylon Subscription entity."
+---
+
+# Billing
+
+The starter ships a billing skeleton: Stripe customer creation on org signup, plan-gated feature helpers, and a webhook handler that syncs Stripe subscription status onto the Pylon `Subscription` entity. Bring your own Stripe key.
+
+## Subscription entity
+
+```ts
+const Subscription = entity(
+  "Subscription",
+  {
+    orgId: field.string(),
+    status: field.string(),                    // trialing | active | past_due | canceled
+    plan: field.string(),                      // free | pro | team | enterprise
+    stripeCustomerId: field.string().optional(),
+    stripeSubscriptionId: field.string().optional(),
+    seats: field.int(),
+    currentPeriodEnd: field.datetime().optional(),
+    createdAt: field.datetime(),
+  },
+  { indexes: [{ name: "by_org", fields: ["orgId"], unique: true }] },
+);
+```
+
+One row per organization. The `Organization.plan` field shadows `Subscription.plan` so callers can do plan-gated checks without a join — see `packages/auth/src/server.ts` for `requirePlan(...)`.
+
+## Plans
+
+| Plan | Members | Audit retention | SSO |
+|---|---|---|---|
+| Free | 5 | 7 days | No |
+| Pro | 25 | 90 days | No |
+| Team | unlimited | 1 year | Yes |
+| Enterprise | unlimited | unlimited | Yes (custom IdP) |
+
+These are enforced server-side. `apps/dashboard/components/billing/plan-gate.tsx` is a Client Component that reads the active org's plan and conditionally renders a CTA.
+
+## Wiring Stripe
+
+<Steps>
+  <Step title="Set environment variables">
+    ```bash
+    # apps/dashboard/.env.local
+    STRIPE_SECRET_KEY=sk_test_...
+    STRIPE_WEBHOOK_SECRET=whsec_...
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+    ```
+  </Step>
+
+  <Step title="Configure products in Stripe">
+    Create one product per plan. Note the price IDs and add them to `packages/db/src/plans.ts`.
+  </Step>
+
+  <Step title="Add the webhook">
+    ```
+    Stripe dashboard → Developers → Webhooks → Add endpoint
+    URL:  https://your-app.com/api/stripe/webhook
+    Events: customer.subscription.{created,updated,deleted},
+            invoice.payment_failed
+    ```
+  </Step>
+</Steps>
+
+The webhook handler at `apps/dashboard/app/api/stripe/webhook/route.ts` verifies the signature and upserts the matching `Subscription` row.
+
+## Manage plan from the UI
+
+`/billing` shows the current plan + buttons for each upgrade target. Clicking an upgrade redirects to a Stripe Checkout session created server-side; the user returns to `/billing?success=1` after paying.

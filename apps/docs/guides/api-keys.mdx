@@ -1,0 +1,88 @@
+---
+title: API keys
+description: "Programmatic access tokens scoped to an org."
+---
+
+# API keys
+
+API keys let users (and CI / external integrations) call your product's API without going through the dashboard. They're org-scoped: a key authenticates as the org, not a user.
+
+## Schema
+
+```ts
+const ApiKey = entity(
+  "ApiKey",
+  {
+    orgId: field.string(),
+    name: field.string(),
+    prefix: field.string(),          // first 8 chars, displayed in UI
+    hash: field.string(),            // bcrypt of the full key
+    createdBy: field.string(),
+    lastUsedAt: field.datetime().optional(),
+    createdAt: field.datetime(),
+  },
+  {
+    indexes: [
+      { name: "by_org", fields: ["orgId"], unique: false },
+      { name: "by_prefix", fields: ["prefix"], unique: true },
+    ],
+  },
+);
+```
+
+We never store the full key. The user sees it once at creation; after that only the `prefix` (e.g. `pyl_live_a1b2c3`) is shown.
+
+## Creating a key
+
+```ts
+// packages/db/functions/createApiKey.ts
+import { randomBytes } from "node:crypto";
+import bcrypt from "bcryptjs";
+
+const fullKey = `pyl_${env}_${randomBytes(24).toString("base64url")}`;
+const prefix = fullKey.slice(0, 16);
+const hash = await bcrypt.hash(fullKey, 10);
+
+await ctx.db.insert("ApiKey", {
+  orgId: args.orgId,
+  name: args.name,
+  prefix,
+  hash,
+  createdBy: ctx.auth.userId,
+  createdAt: new Date().toISOString(),
+});
+
+return { fullKey };   // ⚠️ shown once; never again
+```
+
+## Validating a key
+
+Add a small middleware on your product's API routes:
+
+```ts
+import bcrypt from "bcryptjs";
+import { db } from "@/lib/pylon-server";
+
+export async function authenticateApiKey(req: Request) {
+  const auth = req.headers.get("authorization");
+  if (!auth?.startsWith("Bearer pyl_")) return null;
+  const key = auth.slice("Bearer ".length);
+  const prefix = key.slice(0, 16);
+
+  // Exact prefix match — there's a unique index on it.
+  const candidate = await db.query("ApiKey", { prefix });
+  if (!candidate) return null;
+  if (!(await bcrypt.compare(key, candidate.hash))) return null;
+
+  // Fire-and-forget update of lastUsedAt.
+  db.update("ApiKey", candidate.id, {
+    lastUsedAt: new Date().toISOString(),
+  }).catch(() => {});
+
+  return { orgId: candidate.orgId };
+}
+```
+
+## Revoking a key
+
+The `/api-keys` UI lists all keys for the active org with a Trash button. Deleting the row instantly invalidates the key — Pylon sees the row is gone, the `authenticateApiKey` lookup fails, and the next request gets 401.

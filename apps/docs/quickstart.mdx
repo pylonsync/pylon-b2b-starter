@@ -1,0 +1,66 @@
+---
+title: Quickstart
+description: "Five minutes from clone to first signup."
+---
+
+# Quickstart
+
+<Steps>
+  <Step title="Clone & install">
+    ```bash
+    git clone https://github.com/pylonsync/pylon-b2b-starter.git
+    cd pylon-b2b-starter
+    bun install
+    ```
+  </Step>
+
+  <Step title="Bring up the Pylon backend">
+    ```bash
+    cd packages/db
+    bun run generate-manifest > pylon.manifest.json
+    pylon dev
+    ```
+
+    The schema for `User`, `Organization`, `OrgMember`, `Invitation`,
+    `Subscription`, `ApiKey`, and `AuditEvent` is created automatically.
+  </Step>
+
+  <Step title="Run the apps">
+    ```bash
+    bun dev
+    ```
+
+    Three Next.js apps start in parallel:
+
+    - Marketing: `http://localhost:3000`
+    - Dashboard: `http://localhost:3001`
+    - Docs: `http://localhost:3002` (this site)
+  </Step>
+
+  <Step title="Sign up">
+    Visit the dashboard, hit **Sign up**, create your first user. Onboarding walks you through:
+
+    1. Pick a workspace name
+    2. (Optional) invite teammates
+    3. Pick a plan (Free / Pro / Team)
+
+    You're now inside a fully working multi-tenant SaaS.
+  </Step>
+</Steps>
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="diagram-project" href="/architecture">
+    How the pieces fit together.
+  </Card>
+  <Card title="Authentication" icon="shield-halved" href="/concepts/auth">
+    How sessions + cookies + Pylon work.
+  </Card>
+  <Card title="Policies" icon="lock" href="/concepts/policies">
+    Tenant isolation rules.
+  </Card>
+  <Card title="Deploying" icon="rocket" href="/guides/deploy">
+    Vercel, Fly, self-hosted.
+  </Card>
+</CardGroup>

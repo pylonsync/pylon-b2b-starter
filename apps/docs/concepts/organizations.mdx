@@ -1,0 +1,74 @@
+---
+title: Organizations
+description: "Tenant boundaries — every row owned, every read scoped."
+---
+
+# Organizations
+
+An **organization** is a tenant. Every business row carries `orgId` and the active org on a session controls which rows the user sees.
+
+## Schema
+
+```ts
+const Organization = entity(
+  "Organization",
+  {
+    name: field.string(),
+    slug: field.string(),
+    plan: field.string(),       // free | pro | team | enterprise
+    trialEndsAt: field.datetime().optional(),
+    createdBy: field.string(),
+    createdAt: field.datetime(),
+  },
+  { indexes: [{ name: "by_slug", fields: ["slug"], unique: true }] },
+);
+
+const OrgMember = entity(
+  "OrgMember",
+  {
+    userId: field.string(),
+    orgId: field.string(),
+    role: field.string(),        // owner | admin | member
+    joinedAt: field.datetime(),
+  },
+  {
+    indexes: [
+      { name: "by_user_org", fields: ["userId", "orgId"], unique: true },
+    ],
+  },
+);
+```
+
+## Active tenant
+
+A user can belong to many orgs. The active org for a request comes from:
+
+1. The `pylon-active-org` cookie (set by `/api/auth/active-org`).
+2. The session's `tenant_id` if the cookie is missing (Pylon's `select-org` writes both).
+
+Server components read it via `getSession()`. Pylon evaluates policies against this tenant on every read.
+
+## Switching orgs
+
+```tsx
+async function switchOrg(orgId: string) {
+  await fetch("/api/auth/active-org", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ orgId }),
+  });
+  router.refresh();   // re-render server components with the new tenant
+}
+```
+
+## Roles
+
+Three roles ship by default:
+
+| Role | Can | Can't |
+|---|---|---|
+| `owner` | Everything, including delete the workspace | — |
+| `admin` | Invite, manage members, manage billing | Delete the workspace |
+| `member` | Use the product | Manage workspace settings |
+
+Role checks live in server functions (`createInvitation`, `updateOrgPlan`, …) — see `packages/db/src/manifest.ts` for the policy expressions and the dashboard's API routes for the role gates.

@@ -1,0 +1,61 @@
+---
+title: Architecture
+description: "How the apps, packages, and Pylon backend fit together."
+---
+
+# Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                     Pylon backend                        │
+│   User · Organization · OrgMember · Invitation           │
+│   Subscription · ApiKey · AuditEvent                     │
+│   Policies enforce tenant isolation in the read path     │
+└──────────────────────────────────────────────────────────┘
+                          ▲
+                          │  HTTP / WebSocket
+        ┌─────────────────┼─────────────────┐
+        │                 │                 │
+   apps/marketing   apps/dashboard     apps/docs
+   (Next.js 16)     (Next.js 16)       (Mintlify)
+        │                 │
+        ▼                 ▼
+   public landing      authed product
+                       (cookies, RLS)
+```
+
+## Multi-tenancy
+
+Every business entity (`Subscription`, `ApiKey`, `AuditEvent`, plus anything you add) carries an `orgId`. Pylon's tenant-aware policies refuse to return rows whose org isn't the caller's active tenant. The active tenant is set on the session token via `POST /api/auth/select-org`; the dashboard mirrors it into a cookie so server components can read it.
+
+## Auth flow
+
+1. **Signup** — POST `/api/auth/password/register` with email + password + display name. Pylon mints a `User` row + session token.
+2. **Mirror cookie** — the form posts the token to `/api/auth/session` (a Next.js route handler) which writes an HttpOnly cookie. This is what server components read.
+3. **Onboarding** — new users with no org go to `/onboarding`. Three steps: workspace → invites → plan.
+4. **Active org** — `/api/auth/active-org` posts to Pylon's `select-org` and sets the `pylon-active-org` cookie.
+5. **Middleware gate** — every dashboard route except `/login`, `/signup`, `/accept-invite` requires a session cookie.
+
+## Packages
+
+<AccordionGroup>
+  <Accordion title="@pylon-b2b/ui" icon="palette">
+    Vendored shadcn primitives — button, input, dialog, sheet, sidebar, table, dropdown, …. Themed once via `packages/config/theme.css`. Imported by all three apps.
+  </Accordion>
+  <Accordion title="@pylon-b2b/auth" icon="shield-halved">
+    `getSession` (server), `useSession` (client), `authMiddleware` (Next.js edge). Wraps Pylon's `/api/auth/me` so server components never block on multiple round-trips.
+  </Accordion>
+  <Accordion title="@pylon-b2b/db" icon="database">
+    The Pylon manifest. Run `bun run generate-manifest` to emit `pylon.manifest.json` and start `pylon dev`.
+  </Accordion>
+  <Accordion title="@pylon-b2b/config" icon="gear">
+    Shared `tsconfig.base.json`, `tsconfig.next.json`, and the `theme.css` color tokens.
+  </Accordion>
+</AccordionGroup>
+
+## Why this stack
+
+- **Pylon** — declarative schema + policies + live queries + auth. One binary; SQLite or Postgres. No second service for sessions or realtime.
+- **Next.js 16** — App Router, Server Components for SEO + auth, Server Actions for mutations, Edge middleware for the auth gate.
+- **Tailwind 4** — CSS-first config, no `tailwind.config.js`. Per-app `@theme` blocks override package defaults.
+- **shadcn** — vendored primitives we own and can fork. Wrapped in a workspace package so the three apps share theming.

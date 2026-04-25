@@ -1,0 +1,65 @@
+---
+title: Authentication
+description: "Email + password sessions, cookie-mirrored for SSR."
+---
+
+# Authentication
+
+Email + password via Pylon's `/api/auth/password/{login,register}`. The dashboard mirrors the resulting token into an HttpOnly cookie so Next.js Server Components can resolve the user without an extra round-trip on each request.
+
+## Sign-up flow
+
+```
+POST /api/auth/password/register     → { token, user_id }
+POST /api/auth/session  (Next.js)    → sets HttpOnly cookie
+GET  /onboarding                     → three-step org setup
+```
+
+## Sign-in flow
+
+```
+POST /api/auth/password/login        → { token, user_id }
+POST /api/auth/session  (Next.js)    → sets HttpOnly cookie
+GET  /                               → dashboard home
+```
+
+## Cookies
+
+| Name | Set by | Used for |
+|---|---|---|
+| `pylon-session` | `/api/auth/session` | Bearer token for SSR fetches |
+| `pylon-active-org` | `/api/auth/active-org` | Active tenant on every request |
+
+Both are HttpOnly + SameSite=Lax. They're rotated when the user logs out.
+
+## Reading the session
+
+In a Server Component:
+
+```tsx
+import { getSession } from "@pylon-b2b/auth/server";
+
+export default async function Page() {
+  const session = await getSession();
+  if (!session) redirect("/login");
+  return <h1>Hi {session.user.displayName}</h1>;
+}
+```
+
+In a Client Component:
+
+```tsx
+"use client";
+import { useSession } from "@pylon-b2b/auth/client";
+
+export function Greeting() {
+  const { user } = useSession();
+  return <span>Hi {user.displayName}</span>;
+}
+```
+
+`useSession` reads from a Provider that the layout populates with the SSR-resolved session, so client components don't refetch.
+
+## Middleware gate
+
+`apps/dashboard/middleware.ts` runs on the edge for every request. Anything other than `/login`, `/signup`, `/accept-invite`, `/api/auth/*`, and static assets requires `pylon-session` to be present. If it's not, the user is redirected to `/login?next=<original_path>`.

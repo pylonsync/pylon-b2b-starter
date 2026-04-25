@@ -1,0 +1,63 @@
+---
+title: Audit log
+description: "Append every change to AuditEvent — SOC2-grade trail."
+---
+
+# Audit log
+
+Every meaningful action in the app appends a row to `AuditEvent`. The Audit page (`/audit`) renders the live feed.
+
+## Recording an event
+
+Wrap mutations in a tiny helper:
+
+```ts
+async function audit(
+  ctx: MutationCtx,
+  orgId: string,
+  kind: string,
+  meta?: Record<string, unknown>,
+) {
+  await ctx.db.insert("AuditEvent", {
+    orgId,
+    actorId: ctx.auth.userId!,
+    kind,
+    metaJson: meta ? JSON.stringify(meta) : null,
+    createdAt: new Date().toISOString(),
+  });
+}
+
+// Inside any server function
+await audit(ctx, orgId, "member_invited", { email: args.email });
+```
+
+## Recommended event kinds
+
+| Kind | When |
+|---|---|
+| `workspace_created` | First time the org is seeded |
+| `member_invited` | Invitation sent |
+| `member_joined` | Invitation accepted |
+| `member_role_changed` | Admin changed someone's role |
+| `member_removed` | Admin kicked someone |
+| `plan_changed` | Subscription plan updated |
+| `api_key_created` | New API key minted |
+| `api_key_revoked` | API key deleted |
+
+## Retention
+
+The audit table grows fast. The starter doesn't auto-expire — but each plan tier has a retention policy enforced by a cron:
+
+```ts
+// packages/db/functions/cleanupAuditLog.ts (cron, runs daily)
+const horizons = { free: 7, pro: 90, team: 365, enterprise: Infinity };
+const orgs = await ctx.db.query("Organization");
+for (const org of orgs) {
+  const cutoff = horizonFor(org.plan);
+  if (cutoff === Infinity) continue;
+  await ctx.db.deleteWhere("AuditEvent", {
+    orgId: org.id,
+    createdAt: { "<": isoMinusDays(cutoff) },
+  });
+}
+```

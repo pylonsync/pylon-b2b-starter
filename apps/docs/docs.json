@@ -1,0 +1,86 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "Pylon B2B",
+  "description": "The B2B SaaS starter — multi-tenant Pylon backend, Next.js apps, billing, audit log, all wired up.",
+  "colors": {
+    "primary": "#8B5CF6",
+    "light": "#A78BFA",
+    "dark": "#7C3AED"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "background": {
+    "color": {
+      "dark": "#0A0A0C",
+      "light": "#FFFFFF"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "architecture"
+            ]
+          },
+          {
+            "group": "Core concepts",
+            "pages": [
+              "concepts/organizations",
+              "concepts/auth",
+              "concepts/policies",
+              "concepts/billing"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/invitations",
+              "guides/audit-log",
+              "guides/api-keys",
+              "guides/deploy"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/pylonsync/pylon-b2b-starter",
+          "icon": "github"
+        },
+        {
+          "anchor": "Pylon docs",
+          "href": "https://docs.pylonsync.com",
+          "icon": "book-open"
+        }
+      ]
+    }
+  },
+  "navbar": {
+    "links": [
+      { "label": "GitHub", "href": "https://github.com/pylonsync/pylon-b2b-starter" }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get started",
+      "href": "/quickstart"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/pylonsync/pylon-b2b-starter"
+    }
+  }
+}
