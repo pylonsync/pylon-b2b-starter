@@ -1,0 +1,57 @@
+# Pylon backend for the B2B starter — single Pylon process,
+# SQLite on a persistent volume.
+app = "pylon-b2b-backend"
+primary_region = "iad"
+
+[build]
+  image = "ghcr.io/pylonsync/pylon:latest"
+
+[env]
+  PYLON_DATA_DIR = "/data"
+  PYLON_PORT = "4321"
+  PYLON_WS_PORT = "4322"
+  PYLON_LOG_LEVEL = "info"
+  RUST_LOG = "pylon=info"
+
+[[mounts]]
+  source = "pylon_data"
+  destination = "/data"
+  initial_size = "10gb"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 4321
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "requests"
+    soft_limit = 500
+    hard_limit = 1000
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "10s"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 4322
+
+  [[services.ports]]
+    port = 4322
+    handlers = ["tls"]
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
