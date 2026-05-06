@@ -2,6 +2,6 @@
 @import "tw-animate-css";
 @import "@pylon-b2b/config/theme.css";
 
-@source "./app";
-@source "./components";
-@source "../../packages/ui/src";
+@source "../app";
+@source "../components";
+@source "../../../packages/ui/src";

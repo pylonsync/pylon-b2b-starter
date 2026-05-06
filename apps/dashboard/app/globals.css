@@ -2,6 +2,16 @@
 @import "tw-animate-css";
 @import "@pylon-b2b/config/theme.css";
 
-@source "./app";
-@source "./components";
-@source "../../packages/ui/src";
+/*
+ * Tailwind v4 resolves @source paths relative to the CSS file's
+ * directory. From here that's `apps/dashboard/app/`. Going `../../`
+ * lands in `apps/`, NOT in the repo root — so `../../packages/ui/src`
+ * silently misses the UI package and utilities used only inside
+ * `<SidebarTrigger>` etc. (`sr-only`, layout helpers) get tree-shaken
+ * away. Symptom is screen-reader-only text leaking visible and
+ * sidebar items rendering stacked instead of inline. Need three
+ * `..`s: out of `app/`, out of `dashboard/`, out of `apps/`.
+ */
+@source "../app";
+@source "../components";
+@source "../../../packages/ui/src";
