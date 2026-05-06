@@ -38,6 +38,12 @@ const config: NextConfig = {
     "@pylonsync/functions",
   ],
   images: { unoptimized: true },
+  // Hide the floating Next.js dev/build indicator — it lands in the
+  // bottom-left corner where the dashboard's sidebar footer sits and
+  // covers the "Help & docs" link in dev. The indicator only appears
+  // in `next dev`, never in production, so this is purely a dev
+  // affordance for the dashboard's specific layout.
+  devIndicators: false,
 };
 
 export default config;
