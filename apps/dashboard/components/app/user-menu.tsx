@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@pylon-b2b/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@pylon-b2b/ui/avatar";
-import type { User } from "@pylon-b2b/db";
+import type { User } from "@pylon-b2b/backend";
 
 export function UserMenu({ user }: { user: User }) {
   const router = useRouter();

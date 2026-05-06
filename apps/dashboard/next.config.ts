@@ -4,7 +4,7 @@ const config: NextConfig = {
   transpilePackages: [
     "@pylon-b2b/ui",
     "@pylon-b2b/auth",
-    "@pylon-b2b/db",
+    "@pylon-b2b/backend",
     "@pylon-b2b/config",
     "@pylonsync/react",
     "@pylonsync/sync",

@@ -11,10 +11,12 @@
     "./middleware": "./src/middleware.ts"
   },
   "dependencies": {
-    "@pylon-b2b/db": "workspace:*"
+    "@pylon-b2b/backend": "workspace:*",
+    "react-dom": "^19.2.6",
+    "tailwindcss": "^4.2.4"
   },
   "peerDependencies": {
-    "next": "^16.0.0",
-    "react": "^19.0.0"
+    "next": "^16.2.4",
+    "react": "^19.2.6"
   }
 }

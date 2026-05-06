@@ -5,7 +5,7 @@
  */
 import "server-only";
 import { cookies } from "next/headers";
-import type { Organization, User } from "@pylon-b2b/db";
+import type { Organization, User } from "@pylon-b2b/backend";
 
 export const SESSION_COOKIE = "pylon-session";
 export const ACTIVE_ORG_COOKIE = "pylon-active-org";

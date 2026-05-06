@@ -12,7 +12,7 @@ import {
 } from "@pylon-b2b/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@pylon-b2b/ui/avatar";
 import { cn } from "@pylon-b2b/ui/utils";
-import type { Organization } from "@pylon-b2b/db";
+import type { Organization } from "@pylon-b2b/backend";
 
 export function OrgSwitcher({ activeOrg }: { activeOrg: Organization }) {
   const router = useRouter();

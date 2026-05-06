@@ -1,0 +1,500 @@
+{
+  "manifest_version": 1,
+  "name": "pylon-b2b",
+  "version": "0.1.0",
+  "entities": [
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "email",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "displayName",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "avatarColor",
+          "type": "string",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "passwordHash",
+          "type": "string",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "by_email",
+          "fields": [
+            "email"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "Organization",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "slug",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "logoUrl",
+          "type": "string",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "plan",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "trialEndsAt",
+          "type": "datetime",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "createdBy",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "by_slug",
+          "fields": [
+            "slug"
+          ],
+          "unique": true
+        },
+        {
+          "name": "by_creator",
+          "fields": [
+            "createdBy"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "OrgMember",
+      "fields": [
+        {
+          "name": "userId",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "orgId",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "joinedAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "by_user",
+          "fields": [
+            "userId"
+          ],
+          "unique": false
+        },
+        {
+          "name": "by_org",
+          "fields": [
+            "orgId"
+          ],
+          "unique": false
+        },
+        {
+          "name": "by_user_org",
+          "fields": [
+            "userId",
+            "orgId"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "Invitation",
+      "fields": [
+        {
+          "name": "orgId",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "token",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "invitedBy",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "acceptedAt",
+          "type": "datetime",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "by_org",
+          "fields": [
+            "orgId"
+          ],
+          "unique": false
+        },
+        {
+          "name": "by_token",
+          "fields": [
+            "token"
+          ],
+          "unique": true
+        },
+        {
+          "name": "by_email",
+          "fields": [
+            "email"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "Subscription",
+      "fields": [
+        {
+          "name": "orgId",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "plan",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "stripeCustomerId",
+          "type": "string",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "stripeSubscriptionId",
+          "type": "string",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "seats",
+          "type": "int",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "currentPeriodEnd",
+          "type": "datetime",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "by_org",
+          "fields": [
+            "orgId"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "ApiKey",
+      "fields": [
+        {
+          "name": "orgId",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "prefix",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "hash",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "createdBy",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "lastUsedAt",
+          "type": "datetime",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "by_org",
+          "fields": [
+            "orgId"
+          ],
+          "unique": false
+        },
+        {
+          "name": "by_prefix",
+          "fields": [
+            "prefix"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "AuditEvent",
+      "fields": [
+        {
+          "name": "orgId",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "actorId",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "optional": false,
+          "unique": false
+        },
+        {
+          "name": "metaJson",
+          "type": "string",
+          "optional": true,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "optional": false,
+          "unique": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "by_org",
+          "fields": [
+            "orgId"
+          ],
+          "unique": false
+        },
+        {
+          "name": "by_org_time",
+          "fields": [
+            "orgId",
+            "createdAt"
+          ],
+          "unique": false
+        }
+      ]
+    }
+  ],
+  "routes": [],
+  "queries": [],
+  "actions": [],
+  "policies": [
+    {
+      "name": "user_self",
+      "allowRead": "auth.userId != null",
+      "allowInsert": "false",
+      "allowUpdate": "auth.userId == data.id",
+      "allowDelete": "false",
+      "entity": "User"
+    },
+    {
+      "name": "org_member",
+      "allowRead": "auth.userId != null",
+      "allowInsert": "false",
+      "allowUpdate": "auth.userId != null",
+      "allowDelete": "false",
+      "entity": "Organization"
+    },
+    {
+      "name": "member_visible",
+      "allowRead": "auth.userId != null",
+      "allowInsert": "false",
+      "allowUpdate": "auth.userId != null",
+      "allowDelete": "auth.userId != null",
+      "entity": "OrgMember"
+    },
+    {
+      "name": "invite_org_visible",
+      "allowRead": "auth.userId != null",
+      "allowInsert": "false",
+      "allowUpdate": "false",
+      "allowDelete": "false",
+      "entity": "Invitation"
+    },
+    {
+      "name": "subscription_visible",
+      "allowRead": "auth.userId != null",
+      "allowInsert": "false",
+      "allowUpdate": "false",
+      "allowDelete": "false",
+      "entity": "Subscription"
+    },
+    {
+      "name": "apikey_visible",
+      "allowRead": "auth.userId != null",
+      "allowInsert": "false",
+      "allowUpdate": "false",
+      "allowDelete": "auth.userId != null",
+      "entity": "ApiKey"
+    },
+    {
+      "name": "audit_readonly",
+      "allowRead": "auth.userId != null",
+      "allowInsert": "false",
+      "allowUpdate": "false",
+      "allowDelete": "false",
+      "entity": "AuditEvent"
+    }
+  ],
+  "auth": {
+    "user": {
+      "entity": "User",
+      "expose": [],
+      "hide": []
+    },
+    "session": {
+      "expires_in": 2592000,
+      "cookie_cache": {
+        "enabled": false,
+        "max_age": 300,
+        "claims": [
+          "is_admin",
+          "tenant_id"
+        ]
+      }
+    },
+    "trusted_origins": []
+  }
+}

@@ -26,7 +26,7 @@ import { Input } from "@pylon-b2b/ui/input";
 import { Label } from "@pylon-b2b/ui/label";
 import { Badge } from "@pylon-b2b/ui/badge";
 import { cn } from "@pylon-b2b/ui/utils";
-import type { User } from "@pylon-b2b/db";
+import type { User } from "@pylon-b2b/backend";
 
 const PYLON_URL =
   process.env.NEXT_PUBLIC_PYLON_URL ?? "http://localhost:4321";

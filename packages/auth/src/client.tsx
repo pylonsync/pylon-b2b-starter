@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Organization, User } from "@pylon-b2b/db";
+import type { Organization, User } from "@pylon-b2b/backend";
 
 type SessionShape = {
   user: User;
