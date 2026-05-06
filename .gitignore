@@ -8,3 +8,8 @@ dist/
 .DS_Store
 *.tsbuildinfo
 .vercel
+
+# Pylon dev-mode artifacts (regenerated on each `pylon dev` run)
+.pylon/
+pylon.manifest.json
+pylon.client.ts
