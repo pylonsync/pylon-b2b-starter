@@ -14,8 +14,8 @@
     "@pylon-b2b/config": "workspace:*",
     "@pylon-b2b/db": "workspace:*",
     "@pylon-b2b/ui": "workspace:*",
-    "@pylonsync/react": "workspace:*",
-    "@pylonsync/sync": "workspace:*",
+    "@pylonsync/react": "^0.3.47",
+    "@pylonsync/sync": "^0.3.47",
     "next": "^16.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
