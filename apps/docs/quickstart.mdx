@@ -6,24 +6,16 @@ description: "Five minutes from clone to first signup."
 # Quickstart
 
 <Steps>
-  <Step title="Install the Pylon CLI">
-    ```bash
-    bun add -g @pylonsync/cli
-    pylon --version
-    ```
-
-    The CLI runs the local Pylon dev server (`pylon dev`) and is
-    invoked from the backend's `dev` script under turbo. If you have
-    the framework checked out locally, you can also symlink
-    `target/release/pylon` to anywhere on `$PATH`.
-  </Step>
-
   <Step title="Clone & install">
     ```bash
     git clone https://github.com/pylonsync/pylon-b2b-starter.git
     cd pylon-b2b-starter
     bun install
     ```
+
+    The Pylon CLI is a devDependency of `apps/backend`, so
+    `bun install` provisions the right binary for your platform.
+    No global install needed.
   </Step>
 
   <Step title="Run everything">

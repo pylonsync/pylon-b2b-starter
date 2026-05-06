@@ -13,6 +13,7 @@
     "generate-manifest": "bun run app.ts > pylon.manifest.json"
   },
   "dependencies": {
+    "@pylonsync/functions": "^0.3.47",
     "@pylonsync/sdk": "^0.3.47"
   },
   "devDependencies": {
