@@ -153,7 +153,7 @@ export function Sidebar({
     return (
       <div
         className={cn(
-          "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+          "flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground",
           className,
         )}
         {...props}
@@ -170,7 +170,7 @@ export function Sidebar({
           <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
           <DialogPrimitive.Content
             className={cn(
-              "fixed inset-y-0 z-50 flex w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground shadow-lg transition data-[state=open]:animate-in data-[state=closed]:animate-out",
+              "fixed inset-y-0 z-50 flex w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground shadow-lg transition data-[state=open]:animate-in data-[state=closed]:animate-out",
               side === "left"
                 ? "left-0 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left"
                 : "right-0 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
@@ -195,9 +195,9 @@ export function Sidebar({
       className={cn(
         "group flex flex-col bg-sidebar text-sidebar-foreground border-sidebar-border transition-[width] duration-200 ease-linear",
         side === "left" ? "border-r" : "border-l",
-        "data-[state=expanded]:w-[--sidebar-width]",
+        "data-[state=expanded]:w-(--sidebar-width)",
         collapsible === "icon" &&
-          "data-[state=collapsed]:w-[--sidebar-width-icon]",
+          "data-[state=collapsed]:w-(--sidebar-width-icon)",
         collapsible === "offcanvas" &&
           "data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden",
         className,
