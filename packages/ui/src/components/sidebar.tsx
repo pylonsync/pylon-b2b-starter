@@ -9,6 +9,7 @@
  */
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Slot } from "@radix-ui/react-slot";
 import { PanelLeft, X } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { cn } from "../utils";
@@ -373,7 +374,12 @@ export const SidebarMenuButton = React.forwardRef<
     variant?: "default" | "outline";
   }
 >(({ asChild = false, isActive = false, variant, className, ...props }, ref) => {
-  const Comp = asChild ? "span" : "button";
+  // Use Radix Slot when asChild is on so the className (which carries
+  // `flex items-center gap-2`) lands on the consumer's component
+  // (e.g. Next's `<Link>`) instead of a wrapper `<span>`. Pre-fix the
+  // wrapper owned the flex layout but its `<a>` child didn't, so icon
+  // + label inside the Link stacked vertically.
+  const Comp = asChild ? Slot : "button";
   return (
     <Comp
       ref={ref as React.Ref<HTMLButtonElement>}
