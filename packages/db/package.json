@@ -10,6 +10,7 @@
     "./types": "./src/types.ts"
   },
   "scripts": {
+    "dev": "pylon dev src/manifest.ts",
     "generate-manifest": "bun run src/manifest.ts > pylon.manifest.json"
   },
   "dependencies": {
