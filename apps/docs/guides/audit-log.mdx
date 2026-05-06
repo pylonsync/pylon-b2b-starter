@@ -49,7 +49,7 @@ await audit(ctx, orgId, "member_invited", { email: args.email });
 The audit table grows fast. The starter doesn't auto-expire — but each plan tier has a retention policy enforced by a cron:
 
 ```ts
-// packages/db/functions/cleanupAuditLog.ts (cron, runs daily)
+// apps/backend/functions/cleanupAuditLog.ts (cron, runs daily)
 const horizons = { free: 7, pro: 90, team: 365, enterprise: Infinity };
 const orgs = await ctx.db.query("Organization");
 for (const org of orgs) {

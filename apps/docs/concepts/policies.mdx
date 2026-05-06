@@ -58,4 +58,4 @@ policy({
 
 ## Why string expressions
 
-Policies are stored alongside the schema (in `packages/db/src/manifest.ts`) and evaluated at the storage boundary. They live in your repo, version-controlled with the rest of the schema, and don't require redeploying a custom auth service when you change them. Pylon compiles the expression once at startup and runs it as bytecode on every operation.
+Policies are stored alongside the schema (in `apps/backend/app.ts`) and evaluated at the storage boundary. They live in your repo, version-controlled with the rest of the schema, and don't require redeploying a custom auth service when you change them. Pylon compiles the expression once at startup and runs it as bytecode on every operation.

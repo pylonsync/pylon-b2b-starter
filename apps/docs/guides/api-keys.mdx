@@ -35,7 +35,7 @@ We never store the full key. The user sees it once at creation; after that only 
 ## Creating a key
 
 ```ts
-// packages/db/functions/createApiKey.ts
+// apps/backend/functions/createApiKey.ts
 import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 

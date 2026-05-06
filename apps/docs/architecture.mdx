@@ -36,17 +36,31 @@ Every business entity (`Subscription`, `ApiKey`, `AuditEvent`, plus anything you
 4. **Active org** — `/api/auth/active-org` posts to Pylon's `select-org` and sets the `pylon-active-org` cookie.
 5. **Middleware gate** — every dashboard route except `/login`, `/signup`, `/accept-invite` requires a session cookie.
 
+## Apps
+
+<AccordionGroup>
+  <Accordion title="apps/marketing" icon="globe">
+    Public-facing site. Static-friendly Next.js — landing, pricing, signup CTAs.
+  </Accordion>
+  <Accordion title="apps/dashboard" icon="layout">
+    Authenticated app. Server Components for SSR + auth, Edge middleware for the gate, Server Actions for mutations. Proxies `/api/*` and `/studio/*` same-origin to the backend so no CORS.
+  </Accordion>
+  <Accordion title="apps/docs" icon="book-open">
+    Mintlify docs site (this one).
+  </Accordion>
+  <Accordion title="apps/backend" icon="database">
+    The Pylon backend — manifest, policies, server functions, fly.toml, and the `pylon dev` entry. Defines the `User`, `Organization`, `OrgMember`, `Invitation`, `Subscription`, `ApiKey`, `AuditEvent` entities. Run `bun run generate-manifest` to emit `pylon.manifest.json` for tooling, or `pylon dev` to start the server.
+  </Accordion>
+</AccordionGroup>
+
 ## Packages
 
 <AccordionGroup>
   <Accordion title="@pylon-b2b/ui" icon="palette">
-    Vendored shadcn primitives — button, input, dialog, sheet, sidebar, table, dropdown, …. Themed once via `packages/config/theme.css`. Imported by all three apps.
+    Vendored shadcn primitives — button, input, dialog, sheet, sidebar, table, dropdown, …. Themed once via `packages/config/theme.css`. Imported by all three Next apps.
   </Accordion>
   <Accordion title="@pylon-b2b/auth" icon="shield-halved">
     `getSession` (server), `useSession` (client), `authMiddleware` (Next.js edge). Wraps Pylon's `/api/auth/me` so server components never block on multiple round-trips.
-  </Accordion>
-  <Accordion title="@pylon-b2b/db" icon="database">
-    The Pylon manifest. Run `bun run generate-manifest` to emit `pylon.manifest.json` and start `pylon dev`.
   </Accordion>
   <Accordion title="@pylon-b2b/config" icon="gear">
     Shared `tsconfig.base.json`, `tsconfig.next.json`, and the `theme.css` color tokens.

@@ -5,16 +5,54 @@ description: "Vercel, Fly, self-hosted — pick your shape."
 
 # Deploying
 
-Three apps deploy independently because they cache and scale differently:
+Four apps deploy independently because they cache and scale differently:
 
 | App | Best fit |
 |---|---|
-| `marketing` | Static-friendly. Vercel, Netlify, Cloudflare Pages. |
-| `docs` | Static-friendly. Same options as marketing. |
-| `dashboard` | Needs Node runtime for SSR + auth cookies. Vercel, Fly, Render. |
-| Pylon backend | Long-lived process. Fly, Railway, your own VPS. |
+| `apps/marketing` | Static-friendly. Vercel, Netlify, Cloudflare Pages. |
+| `apps/docs` | Static-friendly. Same options as marketing. |
+| `apps/dashboard` | Needs Node runtime for SSR + auth cookies. Vercel, Fly, Render. |
+| `apps/backend` | Pylon framework. **Pylon Cloud (recommended)**, Fly, your own VPS. |
 
-## Vercel (recommended for the apps)
+## Pylon Cloud (recommended for the backend)
+
+The fastest path: push the backend to Pylon Cloud, point your
+dashboard's `PYLON_BASE_URL` at the resulting `<slug>.pyln.dev`
+URL, deploy the Next apps to Vercel.
+
+```bash
+# Sign up at https://cloud.pylonsync.com, then from the dashboard:
+#   1. New Project → connect this repo
+#   2. Set "App directory" to apps/backend
+#   3. Pick a region close to your users (iad for US-East)
+#   4. (Optional) attach a custom domain — every project also gets
+#      <slug>.pyln.dev free
+```
+
+Pylon Cloud handles: machine provisioning + autoscaling + push-to-
+deploy from main + per-project secrets + TLS + custom domains +
+metrics + audit log + backups. The control plane runs the same
+binary you'd run yourself, just managed.
+
+Pricing: free hobby tier is 1 project, shared-cpu-1x, 512 MB,
+autostop-on-idle. Pro tier opens up scaling, replicas, always-warm.
+
+## Pylon backend on Fly (self-managed)
+
+If you want Fly directly (you own the deploy, the secrets, the
+scaling):
+
+```bash
+cd apps/backend
+fly launch --no-deploy
+fly volumes create pylon_data --size 10
+# Edit fly.toml — mount /data, set DATABASE_URL=sqlite:///data/pylon.db
+fly deploy
+```
+
+For Postgres, set `DATABASE_URL=postgres://...` and skip the volume — Fly's Postgres add-on or any external Postgres works.
+
+## Vercel (for the Next apps)
 
 ```bash
 # Marketing
@@ -25,22 +63,11 @@ vercel --prod
 # Dashboard
 cd apps/dashboard
 vercel --prod
-# Set env: PYLON_BASE_URL, NEXT_PUBLIC_PYLON_URL, STRIPE_SECRET_KEY, …
+# Set env: PYLON_BASE_URL (your Pylon Cloud URL or Fly host),
+#          STRIPE_SECRET_KEY, RESEND_API_KEY, …
 ```
 
 Each app is a standalone Vercel project so they get their own domains, env vars, and scaling profiles.
-
-## Pylon backend on Fly
-
-```bash
-cd packages/db
-fly launch --no-deploy
-fly volumes create pylon_data --size 10
-# Edit fly.toml — mount /data, set DATABASE_URL=sqlite:///data/pylon.db
-fly deploy
-```
-
-For Postgres, set `DATABASE_URL=postgres://...` and skip the volume — Fly's Postgres add-on or any external Postgres works.
 
 ## Self-hosted (one VPS)
 

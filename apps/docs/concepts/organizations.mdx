@@ -71,4 +71,4 @@ Three roles ship by default:
 | `admin` | Invite, manage members, manage billing | Delete the workspace |
 | `member` | Use the product | Manage workspace settings |
 
-Role checks live in server functions (`createInvitation`, `updateOrgPlan`, …) — see `packages/db/src/manifest.ts` for the policy expressions and the dashboard's API routes for the role gates.
+Role checks live in server functions (`createInvitation`, `updateOrgPlan`, …) — see `apps/backend/app.ts` for the policy expressions and the dashboard's API routes for the role gates.

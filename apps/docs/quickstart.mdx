@@ -6,6 +6,18 @@ description: "Five minutes from clone to first signup."
 # Quickstart
 
 <Steps>
+  <Step title="Install the Pylon CLI">
+    ```bash
+    bun add -g @pylonsync/cli
+    pylon --version
+    ```
+
+    The CLI runs the local Pylon dev server (`pylon dev`) and is
+    invoked from the backend's `dev` script under turbo. If you have
+    the framework checked out locally, you can also symlink
+    `target/release/pylon` to anywhere on `$PATH`.
+  </Step>
+
   <Step title="Clone & install">
     ```bash
     git clone https://github.com/pylonsync/pylon-b2b-starter.git
@@ -14,27 +26,24 @@ description: "Five minutes from clone to first signup."
     ```
   </Step>
 
-  <Step title="Bring up the Pylon backend">
-    ```bash
-    cd packages/db
-    bun run generate-manifest > pylon.manifest.json
-    pylon dev
-    ```
-
-    The schema for `User`, `Organization`, `OrgMember`, `Invitation`,
-    `Subscription`, `ApiKey`, and `AuditEvent` is created automatically.
-  </Step>
-
-  <Step title="Run the apps">
+  <Step title="Run everything">
     ```bash
     bun dev
     ```
 
-    Three Next.js apps start in parallel:
+    Turbo brings up four services in parallel:
 
-    - Marketing: `http://localhost:3000`
-    - Dashboard: `http://localhost:3001`
-    - Docs: `http://localhost:3002` (this site)
+    - **Backend** (`apps/backend`) — Pylon at `http://localhost:4321`
+      with Studio at `/studio`. Schema for `User`, `Organization`,
+      `OrgMember`, `Invitation`, `Subscription`, `ApiKey`, and
+      `AuditEvent` is created automatically on first run.
+    - **Marketing** — `http://localhost:3000`
+    - **Dashboard** — `http://localhost:3001`
+    - **Docs** (this site) — `http://localhost:3002`
+
+    The dashboard proxies `/api/*` and `/studio/*` to the backend
+    same-origin via Next rewrites, so the browser never makes
+    cross-origin requests.
   </Step>
 
   <Step title="Sign up">
