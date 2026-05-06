@@ -6,12 +6,11 @@
   "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./manifest": "./src/manifest.ts",
     "./types": "./src/types.ts"
   },
   "scripts": {
-    "dev": "pylon dev src/manifest.ts",
-    "generate-manifest": "bun run src/manifest.ts > pylon.manifest.json"
+    "dev": "pylon dev",
+    "generate-manifest": "bun run app.ts > pylon.manifest.json"
   },
   "dependencies": {
     "@pylonsync/sdk": "^0.3.47"
